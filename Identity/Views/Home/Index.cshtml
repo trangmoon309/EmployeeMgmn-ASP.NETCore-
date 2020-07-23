@@ -1,0 +1,31 @@
+﻿
+
+
+@model IEnumerable<Employee>
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+
+@foreach(var employee in Model)
+{
+    var photoPath = "~/images/" + (employee.PhotoPath ?? "default.jpg");
+
+    <div class=" card m-4" style="width: 28%;float:left">
+        <div class="card-header">
+            <h3>@employee.Name</h3>
+        </div>
+
+        <!--
+            tìm hiểu asp-append-version (image tag helper- bai 35 kuvenkat)    
+        -->
+
+        <img class="card-img-top" src="@photoPath" style="width:100%" asp-append-version="true" />
+
+        <div class="card-footer text-center">
+            <a asp-controller="Home" asp-action="ViewDetail" asp-route-id="@employee.Id" class="btn btn-success">Details</a>
+            <a class="btn btn-primary" asp-controller="Home" asp-action="Edit" asp-route-id="@employee.Id">Edit</a>
+            <a href="#" class="btn btn-danger">Delete</a>
+        </div>
+    </div>
+
+}

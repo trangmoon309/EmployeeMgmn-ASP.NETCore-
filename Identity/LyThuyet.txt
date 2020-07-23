@@ -1,0 +1,304 @@
+﻿
+
+
+1/ ASP.NET Core Identity là một hệ thống thành viên liên quan đến các vấn đề về bảo mất:
+- Create, Read, Update, Delete tài khoản user
+- Confirm account
+- Authentication (xác thực) 
+- Authorization (ủy quyền)
+- Password recovery (hồi phục tài khoản)
+- Xác thực ở bên thứ 2 như SMS,..
+
+2/ Để thực hiện identity cho project của bạn: 
+- Bước 1: class AppDbContext phải kế thừa IdentityDbContext
+- Bước 2: Cấu hình bên Startup.cs
+	services.AddIdentity<IdentityUser, IdentityRole>()
+        .AddEntityFrameworkStores<AppDbContext>();
+
+	+ Trong đó: IdentityUser chứa các thuộc tính như username, passwordHash, Email,... Nếu bạn muốn store những thuộc tính khác như 
+	gender, city thì tạo ra một class mới kế thừa IdentityUser và trong class mới đó bạn có thể thêm các thuộc tính riêng mà bạn mong muốn thêm vào
+	+ IdentityRole chứa các thông tin về quy luật
+	+ Chúng ta muốn lưu trữ và phục hồi thông tin về User và Role bằng cách dùng EF từ Database thì cần phải cấu hình thêm
+	AddEntityFrameWorkStore
+
+- Bước 3: Add Authentication Middleware vào request pipeline
+- Bước 4: Add-migration AddingIdentity
+
+
+3/ UserManager, SinginManager
+- UserManager gồm các method như: CreateAsync, DeleteAsync, UpdateAsync,.. 
+- SignInManager(quản lí các sign in): SignInAsync, SignOutAsync, IsSignedIn,...
+
+4/ Authorization là gì?
+- Authentication là xác định user là ai
+- Authorization thì xác định user có thể hay không thể làm những công việc gì.
+- Authorize attribute controls Authorization
+
+- Authorize tránh việc truy cập vô danh, ví dụ như sau khi đã thêm Authorize vào cho các action, thì user nào chưa login sẽ k được thực
+thi các action đó
+- Để sử dụng các authorize attribute, ta cần phải đăng kí nó bên startup.cs
+- Đây là Require authenticated users
+	services.AddMvc(option => {
+                var policy = new AuthorizationPolicyBuilder()
+                                .RequireAuthenticatedUser()
+                                .Build();
+                option.Filters.Add(new AuthorizeFilter(policy));
+
+- Lỗ hổng trong redirect( redirect vulnerability): Xuất hiện khi ứng dụng của bạn redirect tới một url mà url này được chỉ định bởi
+một querystring hoặc formdata(chứa %, / ,.. trong url). Hoặc xuất hiện khi url được sử dụng mà không được kiểm tra xem nó có phải
+là một local url(url do chúng ta tạo)
+
+5/ Client Side Validation:
+- Như ta đã học các model validation,... nhưng các validation này là ở phía server (server side validation)
+- Khi ta dùng các validate ở phía server nó sẽ phụ thuộc vào tốc độ đường truyền.  Nếu network chậm hoặc server đang trong quá trình xử lí phức tạp
+thì các request các của user sẽ mất một thời gian để chờ đợi đồng thời nó sẽ tăng số lượng tải (on load) trên server. 
+- Vì vậy, khi dùng các client side validation giúp ta tiết kiệm thời gian, nó sẽ xử lý trên client machine và không tốn một round-trip đến server,
+sẽ không cần phải chờ đợi nữa, giúp giảm một thời gian load nhất định.
+- Để thực thi các clide side validation, chúng ta cần 3 file scripts sau:
+	+ jquery.js
+	+ jquery.validate.js
+	+ jquery.validate.unobtrucsive.js (cho phép ta lấy các attribute của server-side validation để sử dụng ở client-side)
+
+
+
+6/ Remote Validation:
+- Client Side validation không phải lúc nào cũng là một giải pháp tối uuw
+- Ví dụ như ta muốn validate việc email mà người dùng đăng kí có tồn tại hay chưa. Nếu muốn valide ở client side thì ta phải gửi tất cả các
+thông tin từ server đến client machine, vì vậy điều này sẽ rất tệ nếu một server có đến vài triệu tài khoản
+- Vì vậy, để thực hiện validate cho trường hợp như trên, ta dùng remote validation
+- Remote Validation cho phép một action method được gọi để sử dụng một client-scripts. Điều này là hữu dụng vì ta có thể validate thông tin mà không cần
+trả về một page như http post => Vì vậy ta cần tạo ra một function để thực hiện
+- Thay vì chờ đến khi click thì ta mới nhận đc thông báo, ta có thể thông báo cho người dùng ngay khi họ vừa gõ xong thông tin bằng cách
+thêm attribute [Remote] cho property bên class ViewModel
+
+
+7/ Custom Validation ATTRIBUTES
+- Dựa trên các validation được xây dựng sẵn, ta có thể custom lại theo ý mình
+- Để làm được điều này trước tiên ta phải tạo 1 class Valid cho riêng mình, sau đỏ lớp này cần phải kế thừa lớp ValidationAttribute
+- Sau đó ta override các method cần thiết và custom theo ý mình
+- Vd: ValidEmailDomainAttribute.cs
+- Sau đó thêm validation attribute này vào cho propety mà mình mong muốn với các tham số nếu có
+
+
+8/ Exentend IdentityUser
+- Sau khi tạo ra một lớp ApplicationUser : IdentityUser, ta cần phải chỉnh sửa lại các chỗ đã đăng kí = IdentityUser thành ApplicationUser
+bằng cách chuộc phải vào IDentityUser -> References và edit lại
+- Nhớ là chỉnh ở AppDbContext để có thể add-migration thành công!
+
+
+
+9/ Create roles (Tạo phân quyền)
+- IdentityRole là lớp có sẵn, bao gồm các prop: Id, Name, NormalizedName, ConcurrencyStamp
+- Ta tạo một Controller mới : Administration chứa IdentityRole để thực hiện các method: Create,Delete,Update,...
+- Sau đó thì thêm các action cần thiết vào như: CreateRole,...
+
+
+
+10/ Add or remove users from same role
+- Table User và table Role có quan hệ nhiều nhiều
+- Vì vậy bảng trung gian là AspNetUserRoles(gồm khóa ngoại là RodeId và UserId)
+- Vì vậy cần tạo ra một class để lưu dữ liệu match từ 2 bảng: UserRoleViewModel, tuy nhên k cần thuộc tính RoleId bởi vì nó đã
+được truyền vào model từ EditRoleViewModel nên chúng ta k cần property này trong UserRoleViewModel
+
+
+
+11/ Role dựa trên Authorization (thuộc tính [Authorize(Roles = "Administration")])
+- Để thực hiện phân quyền chức năng cho user, chúng ta đặt [Authorize(Roles = "Administration")]) vào trên class Administration để thể hiện
+rằng controller này là phần xử lí dành cho admin mới có thể làm được
+
+
+
+12/
+- dùng CASCADE để khi ta xóa dữ liệu ở bảng cha, thì ở các bảng con cũng tự mất đi dữ liệu liên quan đến bảng cha
+- TUy nhiên thì ta sẽ k dùng cascade, thay vì tự động. Nếu như ta xóa 1 role, ta sẽ xóa tất cả các user của role đó trước rồi mới xóa role đó!
+
+
+
+13/ Claim:
+- Một cặp giá trị dùng để đưa ra quyết định kiểm soát truy cập
+- Claim là một cặp giá trị đại diện cho 1 chủ thể, chủ thể LÀ GÌ chứ không phải chủ thể LÀM GÌ.
+- Ví dụ: chúng ta muốn cho phép 1 user nào đó có thể thực hiện công việc chỉnh sửa details dành cho các employee
+nếu user đó có Edit Employee Claim.
+- Vì vậy, ta có thể dùng claim để tạo ra Authorization Check (Claims based Authorization)
+- Đầu tiên là cách để add/remove 1 claim cho user
+
+
+
+14/ Claims based Authorization
+- Ví dụ bạn có một bằng lái xe, trên đó có ngày sinh của bạn. Thì, claim name: DateofBirth còn claim value: 8th June 1970
+- Và claims based Author nghĩa là, kiểm tra	value của claim và cho phép truy cập dựa vào value đó.
+- Ví dụ như để bạn đc phép vào một night club thì cổng an ninh yêu cầu ngày tháng năm sinh của bạn
+- 1 identity có thể chứa nhiều claims với nhiều value và cũng có thể chứa nhiều claims có cùng kiểu 
+
+
+- Để thực hiện claims dựa trên authorization, ta làm theo 2 bước:
+	+ Bước 1: Tạo Claims Policy.Claims are policy(chính sách) based. We create a policy and include one or more claims in that policy. 
+	We then need to register the policy. Creating and registering a claims policy is typically done in one step in ConfigureServices() 
+	method of the Startup class.
+
+		services.AddAuthorization(options => {
+			options.AddPolicy("DeleteRolePolicy", policy => policy.RequireClaim("DeleteRole"));
+		});
+
+		**Trong đó, options là Authorization Options. AddPolicy(tên policy, chính sách)
+
+	+ Bước 2: Sau khi đăng kí thì có thể sử dụng policy đó(ở controller/action) bằng cách, ví dụ:
+		[HttpPost]
+		[Authorize(Policy="DeleteRolePolicy")]
+		public async Task<IActionResult> DeleteRole(string id){}
+
+		Đoạn code trên có nghĩa là, để thực hiện được action DeleteRole thì user phải có DeleteRole claim
+
+	=> Khi một user cố gắng truy cập vào action mà họ k có claim thì tự động url dẫn đến Access Denied
+
+
+
+15/ Roles based Authorization & Claims based Authorization:
+- Trong ASP.NET Core thì Role là một Claim mà có Role TYpe(A Role is a Claim with Type-Role)
+- gender, username, password,... cũng được hiểu như một claim
+
+      options.AddPolicy("AdminRolePolicy", policy => policy.RequireRole("Admin"));
+                + Từ đây, ta có thể dùng:
+                + C1: [Authorize(Roles="Admin")   :Rose based
+                + C2: [Authorize(Policy = "AdminRolePolicy")]   :Claim base
+
+- Claims Based được recommend dùng hơn, tùy thuộc vào yêu cầu về phân quyền trong ứng dụng của bạn mà claims based có thể nên
+đc sử dụng nhiều hơn.
+- Bạn có teher dùng rose Based author hoặc claims based author hoặc kết hợp cả 2
+
+
+16/ Authorization in VIEWS:
+- để them authorization vào Views cshtml của bạn(ví dụ như user có role là User thì k hiện button Edit Role chẳng hạn.)
+- B1:	@using Microsoft.AspNetCore.Authorization
+		@inject IAuthorizationService authorizationService;
+
+- B2: if(await authorizationService.AuthorizeAsync(User,policy)){//code}
+- Tuy nhiên, nếu ta chỉ xử lí ở phần giao diện thôi là chưa đủ, vì user có thể tìm đến view mà mình mong muốn
+thông qua gõ URL đến view đó. Vì vậy, để đầy đủ hơn ta cần thêm Authorize Attribute cho action của view đó nữa.
+
+
+
+17/Change AccessDenied route 
+- Để thay đổi lại cơ chế route đến AccessDenied, ta cấu hình nó ở Startup như sau
+	services.ConfigureApplicationCookie(options =>
+            {
+                options.AccessDeniedPath = new PathString("/Administration/AccessDenied");
+            });
+
+
+18/ Claim type and claim value in claims policy based authorization:
+- ClaimType: Edit Role, ClaimValue: true/false 
+-	result = await userManager.AddClaimsAsync(user,
+                    from item in model.Claims
+                    where item.IsSelected == true
+                    select new Claim(item.ClaimType, item.IsSelected ? "true" : "false")
+                );
+
+- ClaimType comparison is case in-sensitive
+- ClaimValue comparison is case sensitive
+
+
+19/Create custom authorization policy using func:
+- Khi chúng ta muốn tạo ra một policy với multiphy requirements
+- Ví dụ như: user là ADMIN và phải có claim Edit Role với claim.Value = true hoặc là một Super Admin 
+- Nếu chúng ta dùng cách cũ:
+	services.AddAuthorization(options => {
+		options.AddPolicy("EditRolePolicy", policy => policy.
+			.RequireRole("Admin")
+			.RequireClaim("Edit Role","true")
+			.RequireRole("Super Admin")
+			);
+	})
+	Cách này có nghĩa: Nếu user đảm bảo cả 3 yêu cầu trên thì mới được sử dụng action đó.
+	Nếu làm như thế này thì ta k thể hiện được mối quan hệ giữa các requiments
+
+- Tuy nhiên, yêu cầu của chúng ta là: user có thể đáp ứng 2 trong 3 requirement là đã có thể access vào action mong muốn,
+vì vậy, ta cần sử dụng Func Type, bằng cách:
+
+	services.AddAuthorization(options => {
+		options.AddPolicy("EditRolePolicy", policy => policy.RequireAssertion(context => 
+                    context.User.IsInRole("Admin") &&
+                    context.User.HasClaim(claim => claim.Type == "Edit Role" && claim.Value == "true") ||
+                    context.User.IsInRole("Super Admin")
+                ));
+
+- Nhược điểm của việc xài func để custom policy đó là, không thể truy cập vào route data hoặc query string parameter
+và chúng ta cần phải access vào các services khác như thông qua DI
+
+
+
+20/ Custom authorization requirements and handlers:
+- Vì sao chúng ta cần phải custom, vì thực tế thì yêu cầu đối với ứng dụng của chúng ta là phức tạp hơn rất nhiều
+so với những hàm có sẵn mà chúng ta đang dùng như (RoleAuthorizationRequirement, AssertionRequirement,...)
+- Một authorization policy có 1 hoặc nhiều requirement, mỗi requirement lại có 1 hoặc nhiều handler
+
+- Tất cả các hàm có sẵn là từ interface: IAuthorizationRequirement
+- Vì vậy, chúng ta sẽ custome lại class IAuthorizationRequirement
+- Chúng ta sẽ tạo ra AuthorizationHandle<T> với T là requirement
+
+- Ví dụ 1 requirement như: Một ADMIN có thể quản lí role và claim cho các Admin khác, nhưng họ k thể chỉnh sửa cho role
+và claim của chính họ
+
+- Đầu tiên, ta tạo ra một class có tên là ManageAdminRoleAndClaimRequirement : IAuthorizationRequirement (đây là requirement)
+- Sau đó, tạo class CanEditOnlyOtherAdminRolesAndClaimsHandler : AuthorizationHandler<ManageAdminRoleAndClaimRequirement> (đây là handler cho requirement trên)
+
+- Giải thích: 
+	+ ClaimTypes.NameIdentifier: Gets the URI for a claim that specifies the name of an entity.
+		(Trả về URL cho 1 cái claim mà claim đó chỉ định tên của thực thể)
+
+
+21/ Custom authorization handler success vs failure
+- Giá trị trả về của Authorization Handler thường là:
+	+ context.Succeed()		- Success
+	+ context.Fail()		- Fail
+	+ Task.CompletedTask()	- Nothing
+
+- Vấn đề: Khi ta có 2 handler cho 1 requirement. Nếu handler 1 trả về Fail(), sau đó nhảy quá handler 2 thì lại trả về Success()
+	**=> Policy vẫn fail vì: When one of the handlers return failure, the policy fails even if the other handlers return success.
+	=> Vì Fail được ưu tiên hơn Success
+
+- Vì vậy để 1 policy thành công thì tất cả các explicit handler của nó phải trả về Success
+- Theo mặc định, tất cả các hanlders đều được gọi, kể cả có trả về fail, success hay nothing thì tất cả các handlers đều sẽ được gọi
+- Nếu muốn không gọi đến các handlers còn lại sau khi đã có 1 handler trả về Fail thì ta:
+	*** set InvokeHandlersAfterFailure = false
+		options.InvokeHandlersAfterFailure = false
+
+
+
+*22/ External Identity Providers in Authentication(Facebook,Google,Microsolf,...)
+- Bước 1: Để đăng kí google api cho app của chúng ta, truy cập vào: console.developers.google.com; developers.facebook.com
+- Bước 2: Tạo project, STS(Security Token Service)
+- Bước 3: Enable Google+ API
+- Bước 4: Cấu hình OAuth Service trong mục OAuth consent screen
+- Bước 5: Tạo OAuth Client credentials trong mục Identifiants
+
+Các bước để cài đặt GG Auth vào UI: (để sử dụng services, tải package Microsolf.AspNetCore.App)
+- B1: Ở startup.cs, ta đăng kí service:
+	services.AddAuthentication(){
+		.AddGoogle(options => {
+			options.ClientId = "..".
+			options.ClientSecret = "..." //Ở trong phần IDentifiants mà t đã đăng kí trong google
+		})
+	}
+
+- B2: Thiết kế VIEW, thêm property vào cho LoginViewModel
+- B3: Tạo ra 2 action: ExternalLogin và ExternalLoginCallBack
+
+
+
+23/ Secret Manager:
+- Chúng ta dùng secret manager để giư bí mật các thông tin như: database connection string, API, encryption key of source control
+- Chúng ta không nên lưu trữ những thông tin bảo mật trong configuration files bởi vì:
+	+ Bởi vì khi ta commit source control repository của ta lên, mội người có thể access vào repository sẽ có thể truy cập được những thông tin 
+	bảo mật in các file đó và có thể bị lạm dụng.
+- Vì vậy, không nên lưu thông tin về database, API, các bên thứ 3 vào trong configuration mà dùng SECRET MANAGER 
+- Chúng ta sẽ lưu ở secrets.json, bằng cách chọn Project -> chọn Manage User Secrets
+- Cấu trúc của secrets.json tương tự với appSettings.json
+
+- Việc chúng ta làm chỉ là move các dữ liệu cần thiết từ appSetting sang cho secrets chứ k cần phải thực hiện các config nào khác nữa
+- Tại sao asp.net core có thể tự động làm được việc này mà k cần config các thay đổi nào hêt?
+	Vì IConfiguration Service ở Startup.cs đã được cài đặt để đọc tất cả các configuration info từ tất cả các nguồn configurations như:	
+		+ appSettings.json
+		+ User Secrets
+		+ Enviroment variables
+		+ Command-line argument

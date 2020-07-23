@@ -1,0 +1,63 @@
+﻿
+@{
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+@model Identity.ViewModels.LoginViewModel;
+
+
+<div class="row">
+    <div class="col-md-6">
+        <h1>Local Account Login</h1>
+        <form asp-action="Login" asp-controller="Account" method="post">
+            <div class="form-group">
+                <label asp-for="@Model.Email"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="@Model.Password"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <div class="custom-checkbox">
+                    <label asp-for="RememberMe">
+                        <input asp-for="RememberMe" />
+                        @Html.DisplayNameFor(m => m.RememberMe)
+                    </label>
+                </div>
+            </div>
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <input type="submit" class="btn btn-primary" />
+        </form>
+    </div>
+    <div class="col-md-6">
+        <h1>External Login</h1>
+        <hr />
+        @{ 
+            if(Model.ExternalLogin.Count == 0)
+            {
+                <div>No external logins configued!</div>
+            }
+            else
+            {
+                <form method="post" asp-controller="Account" asp-action="ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" >
+                    <div>
+                        @foreach(var item in Model.ExternalLogin)
+                        {
+                            //có name = provider, giúp ta biding giá trị của value sang cho para provider của action
+                        <button type="submit" class="btn btn-primary" name="provider" value="@item.Name">@item.DisplayName</button>
+                        }
+                    </div>
+                </form>
+            }
+        }
+    </div>
+</div>

@@ -1,0 +1,91 @@
+﻿
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<ApplicationUser> signInManager;
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - _49.RepositoryPattern</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <script src="~/lib/jquery/jquery.js"></script>
+    <script src="~/lib/jquery-validate/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <a class="navbar-brand" asp-action="Index" asp-controller="Home">
+            <i class=" fa fa-gittip" style="color:white; font-size: 25px;"> <span style=" font-family: 'Roboto', sans-serif;">HPTRANG</span></i>
+        </a>
+
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#collapseNavbar">
+            <i class="fa fa-navicon"></i>
+        </button>
+
+        <div class="collapse navbar-collapse" id="collapseNavbar">
+            <ul class="navbar-nav" style="font-size:18px">
+                <li class="nav-item">
+                    <a asp-controller="Home" asp-action="Index" class="nav-link">List</a>
+                </li>
+                <li class="nav-item">
+                    <a asp-controller="Home" asp-action="Create" class="nav-link">Create</a>
+                </li>
+                @if (signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                {
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" id="DropDownList" data-toggle="dropdown">Manage</a>
+                        <div class="dropdown-menu" aria-labelledby="DropDownList">
+                            <a class="dropdown-item" asp-action="ListUsers" asp-controller="Administration">Users</a>
+                            <a class="dropdown-item" asp-action="ListRole" asp-controller="Administration">Roles</a>
+                        </div>
+                    </li>
+                }
+
+
+
+            </ul>
+
+            <ul class="navbar-nav ml-auto">
+                @if (signInManager.IsSignedIn(User))
+                {
+                    <li class="nav-item">
+                        <form method="post" asp-action="Logout" asp-controller="Account">
+                            <button type="submit" class="nav-link btn btn-link py-0">
+                                LogOut   @User.Identity.Name
+                            </button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+
+                    <li class="nav-item">
+                        <a asp-controller="Account" asp-action="Register" class="nav-link">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a asp-controller="Account" asp-action="Login" class="nav-link">Log in</a>
+                    </li>
+                }
+
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        @RenderBody()
+    </div>
+
+    @if (IsSectionDefined("Scripts"))
+    {
+        @RenderSection("Scripts", required:true)
+    }
+
+</body>
+</html>

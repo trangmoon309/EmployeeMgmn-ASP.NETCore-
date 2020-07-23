@@ -1,0 +1,63 @@
+﻿
+@{
+    ViewData["Title"] = "ManageUserRole";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<Identity.ViewModels.Identity.UserRoleVIewModel>;
+@{
+    var userId = ViewBag.userId;
+}
+
+<form method="post" asp-action="ManageUserRole" asp-controller="Administration" asp-route-userId="@userId">
+    <div class="card">
+        <div class="card-header">
+            <h1>Manage User's Role</h1>
+        </div>
+        <div class="card-body">
+            @*@foreach (var user in Model)
+        {
+            <div class="form-check m-1">
+                <input type="hidden" asp-for="@user.RoleId" />
+                <input type="hidden" asp-for="@user.RoleName" />
+                <input type="hidden" asp-for="@user.UserId" />
+                <input type="hidden" asp-for="@user.UserName" />
+
+                <input type="checkbox" asp-for="@user.IsSeleted" class="form-check-input" />
+                <label asp-for="@user.IsSeleted" class="form-check-label">@user.RoleName</label>
+            </div>
+        }*@
+            <!--
+                
+            ********************************** LÍ DO VÌ SAO K THỂ DÙNG FOR EACH ***************
+            Model binding not working on submitting razor view with foreach loop
+                - Sự khác nhau là khi ta dùng foreach thì tạo mỗi phần tử trong list khi được
+                rend ra html thì id và name có chùng đều giống nhau => Khi ta remove or add 1 phần tử nào
+                đó thì sẽ bị trình trạng xóa hết 
+                
+                - Còn đối với vòng for thì khi rend ra html thì id và name của mỗi phần tử sẽ được lưu
+                theo index, và khác nhau => đúng yêu cầu
+       
+        -->
+
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <div class="form-check m-1">
+                    <!--Sử dụng input hidden cho những dữ liệu mà mình show lên ở view, k cần phải làm hết-->
+                    <input type="hidden" asp-for="@Model[i].RoleId" />
+                    <input type="hidden" asp-for="@Model[i].RoleName" />
+                    <input asp-for="@Model[i].IsSeleted" class="form-check-input" />
+                    <label class="form-check-label" asp-for="@Model[i].IsSeleted">
+                        @Model[i].RoleName
+                    </label>
+                </div>
+            }
+
+        </div>
+        <div class="card-footer">
+            <input type="submit" value="Update" class="btn btn-primary" />
+            <a asp-action="EditUser" asp-controller="Administration" asp-route-userId="@userId">Cancel</a>
+        </div>
+    </div>
+</form>
+
+

@@ -1,0 +1,33 @@
+﻿
+@{
+    ViewData["Title"] = "ManageClaim";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model Identity.ViewModels.Identity.UserClaimsViewModel;
+
+
+<form method="post" asp-action="ManageClaim" asp-controller="Administration"  asp-route-userId="@Model.UserId">
+    <div class="card">
+        <div class="card-header">
+            <h1>Manage User's Claims</h1>
+        </div>
+            @for (int i = 0; i < Model.Claims.Count; i++)
+            {
+                <div class="form-check m-1">
+                    <!--Sử dụng input hidden cho những dữ liệu mà mình show lên ở view, k cần phải làm hết-->
+                    <input type="hidden" asp-for="@Model.Claims[i].ClaimType" />
+                    <input asp-for="@Model.Claims[i].IsSelected" class="form-check-input" />
+                    <label class="form-check-label" asp-for="@Model.Claims[i].IsSelected">
+                        @Model.Claims[i].ClaimType
+                    </label>
+                </div>
+            }
+
+        <div class="card-footer">
+            <input type="submit" value="Update" class="btn btn-primary" />
+            <a asp-action="EditUser" asp-controller="Administration" asp-route-userId="@Model.UserId">Cancel</a>
+        </div>
+    </div>
+</form>
+

@@ -1,0 +1,25 @@
+﻿
+@{
+    Layout = null;
+    ViewBag.Title = "Not Found";
+
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>NotFound</title>
+
+    <h1>@ViewBag.ErrorMessege</h1>
+    <h1>@ViewBag.Path</h1>
+    <h1>@ViewBag.QS</h1>
+
+    <a asp-action="Index" asp-controller="Home">
+        Click here to navigate to home page.
+    </a>
+</head>
+<body>
+</body>
+</html>

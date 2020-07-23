@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewData["Title"] = "EditRole";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Identity.ViewModels.Identity.EditRoleViewModel;
+
+<h1>Edit Role</h1>
+<form method="post" asp-controller="Administration" asp-action="EditRole" class="mb-3">
+    <div class="form-group row">
+        <label class="col-md-2 col-form-label" asp-for="Id"></label>
+        <div class="col-md-10 ">
+            <input asp-for="Id" class="form-control" disabled />
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-md-2 col-form-label" asp-for="RoleName"></label>
+        <div class="col-md-10">
+            <input asp-for="RoleName" class="form-control" />
+            <span asp-validation-for="RoleName" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="form-group-row">
+        <div class="col-sm-10">
+            <input type="submit" class="btn btn-primary" asp-action="EditRole" asp-controller="Administration" value="Update" />
+            <a asp-action="ListRole" asp-controller="Administration" class="btn btn-primary">Cancel</a>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h3>User in Role </h3>
+        </div>
+        <div class="card-body">
+            @if (Model.Users.Any())
+            {
+                foreach (var user in Model.Users)
+                {
+                    <h5 class="card-title">@user</h5>
+                }
+            }
+            else
+            {
+                <h5 class="card-title">None at the moment</h5>
+            }
+        </div>
+        <div class="card-footer">
+            <a class="btn btn-primary text-white" asp-controller="Administration" asp-action="EditUserInSameRole" asp-route-roleId="@Model.Id">Add Or Remove User</a>
+        </div>
+    </div>
+
+
+</form>
+
+
+
+

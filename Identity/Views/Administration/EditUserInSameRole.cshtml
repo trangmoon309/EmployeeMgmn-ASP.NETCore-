@@ -1,0 +1,40 @@
+﻿    
+@{
+    ViewData["Title"] = "EditUserInSameRole";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var roleId = ViewBag.roleId;
+}
+
+@model List<Identity.ViewModels.Identity.UserRoleVIewModel>;
+
+<h1>Add or Remove user in the same Role</h1>
+
+<form method="post">
+    <div class="card">
+        <div class="card-body">
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <div class="form-check m-1">
+                    <!--Nếu k có 2 dòng input này thì không thể binding giá trị UserId và UserName sang cho controller, nó sẽ là null nếu
+                        ta k có 2 dòng input này-->
+                    <input type="hidden" asp-for="@Model[i].UserId" />
+                    <input type="hidden" asp-for="@Model[i].UserName" />
+
+                    <input asp-for="@Model[i].IsSeleted" class="form-check-input" />
+
+                    <label class="form-check-label" asp-for="@Model[i].IsSeleted">
+                        <!--Khi click vao label nao thi checkbox cua label tuong ung se duoc chon-->
+                        @Model[i].UserName
+                    </label>
+                </div>
+            }
+        </div>
+        <div class="card-footer">
+            <input type="submit" value="Update" class="btn btn-primary"
+                   style="width:auto" />
+            <a asp-action="EditRole" asp-route-roleId="@roleId"
+               class="btn btn-primary" style="width:auto">Cancel</a>
+        </div>
+    </div>
+</form>

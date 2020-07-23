@@ -1,0 +1,26 @@
+﻿
+@{
+    Layout = null;
+}
+
+@model int
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>EmployeeNotFound</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" />
+    <script src="~/lib/jquery/jquery.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+</head>
+<body>
+    <div class="row bg-danger p-5 text-white text-center" style="font-size:30px;">Employee with ID = @Model is not found!</div>
+    <a class="btn btn-success m-3" asp-controller="Home" asp-action="Index">Click here to comeback employee list!</a>
+</body>
+</html>
