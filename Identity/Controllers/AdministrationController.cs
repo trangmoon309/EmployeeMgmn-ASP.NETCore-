@@ -441,6 +441,7 @@ namespace Identity.Controllers
                 UserId = userId,
             };
 
+            //Thêm tất cả các claim strong claimstore vào user
             foreach (Claim claim in ClaimsStore.AllClaims)
             {
                 UserClaim userClaim = new UserClaim

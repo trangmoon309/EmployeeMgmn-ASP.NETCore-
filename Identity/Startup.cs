@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace Identity
 {
@@ -29,12 +30,31 @@ namespace Identity
             services.AddDbContextPool<AppDbContext>(options => options.UseSqlServer(_configuration.GetConnectionString("EmployeeDBConnection")));
 
             //Authentication Service
-            services.AddIdentity<ApplicationUser, IdentityRole>(options => {
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
                 options.Password.RequiredLength = 10;
                 options.Password.RequiredUniqueChars = 3;
                 options.Password.RequireNonAlphanumeric = false;
+                options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfimation";
+
+                options.SignIn.RequireConfirmedEmail = true;
             })
-                    .AddEntityFrameworkStores<AppDbContext>();
+                    .AddEntityFrameworkStores<AppDbContext>()
+                    //Sử dụng token để confirm email (register Action)
+                    .AddDefaultTokenProviders()
+                    .AddTokenProvider<CustomEmailConfirmationTokenProvider<ApplicationUser>>("CustomEmailConfimation");
+
+            services.Configure<DataProtectionTokenProviderOptions>(o =>
+            {
+                //Thay đổi vòng đời của tất cả các loại token
+                o.TokenLifespan = TimeSpan.FromHours(5);
+            });
+
+            services.Configure<CustomEmailConfirmationTokenProviderOptions>(o =>
+            {
+                //Thay đổi vòng đời của tất cả các loại token
+                o.TokenLifespan = TimeSpan.FromHours(3);
+            });
 
             //services.Configure<IdentityOptions>(options =>
             //{

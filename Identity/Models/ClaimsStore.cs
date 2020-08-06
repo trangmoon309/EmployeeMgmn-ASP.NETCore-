@@ -14,8 +14,6 @@ namespace Identity.Models
             new Claim("Edit Role","Edit Role"),
             new Claim("Delete Role","Delete Role")
         };
-        
-
 
     }
 }

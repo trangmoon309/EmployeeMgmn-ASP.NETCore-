@@ -190,3 +190,8 @@ D:\Self-learning\(3).C#\6.ASP.NET Core\kuvenkat\Identity\Identity\obj\Debug\netc
 D:\Self-learning\(3).C#\6.ASP.NET Core\kuvenkat\Identity\Identity\obj\Debug\netcoreapp3.1\Identity.MvcApplicationPartsAssemblyInfo.cache
 D:\Self-learning\(3).C#\6.ASP.NET Core\kuvenkat\Identity\Identity\bin\Debug\netcoreapp3.1\Properties\serviceDependencies.json
 D:\Self-learning\(3).C#\6.ASP.NET Core\kuvenkat\Identity\Identity\bin\Debug\netcoreapp3.1\Properties\serviceDependencies.local.json
+D:\Self-learning\(3).C#\6.ASP.NET Core\kuvenkat\Identity\Identity\obj\Debug\netcoreapp3.1\Razor\Views\Account\ConfirmEmail.cshtml.g.cs
+D:\Self-learning\(3).C#\6.ASP.NET Core\kuvenkat\Identity\Identity\obj\Debug\netcoreapp3.1\Razor\Views\Account\ForgotPassword.cshtml.g.cs
+D:\Self-learning\(3).C#\6.ASP.NET Core\kuvenkat\Identity\Identity\obj\Debug\netcoreapp3.1\Razor\Views\Account\ForgotPasswordConfirmation.cshtml.g.cs
+D:\Self-learning\(3).C#\6.ASP.NET Core\kuvenkat\Identity\Identity\obj\Debug\netcoreapp3.1\Razor\Views\Account\ResetPassword.cshtml.g.cs
+D:\Self-learning\(3).C#\6.ASP.NET Core\kuvenkat\Identity\Identity\obj\Debug\netcoreapp3.1\Razor\Views\Account\ResetPasswordConfirmation.cshtml.g.cs
